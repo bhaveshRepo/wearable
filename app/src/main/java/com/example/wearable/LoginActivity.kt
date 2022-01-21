@@ -25,7 +25,10 @@ class LoginActivity : AppCompatActivity() {
 
         binding.btLogin.setOnClickListener {
             if(binding.etUserName.text!!.isNotEmpty() && binding.etNumber.text!!.isNotEmpty()){
-
+                if(binding.etNumber.text!!.length < 10 || binding.etNumber.text!!.length > 10){
+                    binding.etNumber.error = "Enter valid number"
+                }
+                else{
                 editor.putString("name",binding.etUserName.text.toString())
                 editor.putString("number",binding.etNumber.text.toString())
                 editor.commit()
@@ -33,6 +36,7 @@ class LoginActivity : AppCompatActivity() {
                 Intent(this,MainActivity::class.java).let {
                     startActivity(it)
                     finish()
+                    }
                 }
             } else
             {

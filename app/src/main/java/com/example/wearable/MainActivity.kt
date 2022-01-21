@@ -62,7 +62,7 @@ import java.io.PrintStream
 
         locationRequest = LocationRequest.create().apply {
             interval = TimeUnit.MINUTES.toMillis(5)
-            fastestInterval = TimeUnit.MINUTES.toMillis(4)
+            fastestInterval = TimeUnit.SECONDS.toMillis(30)
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
