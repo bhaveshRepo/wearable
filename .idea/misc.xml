@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Bhavesh/StudioProjects/Wearable/app/src/main/res/drawable/background_border.xml" value="0.18333333333333332" />
+        <entry key="..\:/Users/Bhavesh/StudioProjects/Wearable/app/src/main/res/drawable/dummy.xml" value="0.18333333333333332" />
         <entry key="..\:/Users/Bhavesh/StudioProjects/Wearable/app/src/main/res/layout/activity_login.xml" value="0.20018115942028986" />
         <entry key="..\:/Users/Bhavesh/StudioProjects/Wearable/app/src/main/res/layout/activity_main.xml" value="0.17753623188405798" />
+        <entry key="..\:/Users/Bhavesh/StudioProjects/Wearable/app/src/main/res/layout/activity_notification.xml" value="0.20018115942028986" />
         <entry key="..\:/Users/Bhavesh/StudioProjects/Wearable/app/src/main/res/layout/fragment_location.xml" value="0.17753623188405798" />
       </map>
     </option>

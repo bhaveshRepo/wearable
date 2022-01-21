@@ -24,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
         checkLogin()
 
         binding.btLogin.setOnClickListener {
-            if(binding.etUserName.text.isNotEmpty() && binding.etNumber.text.isNotEmpty()){
+            if(binding.etUserName.text!!.isNotEmpty() && binding.etNumber.text!!.isNotEmpty()){
 
                 editor.putString("name",binding.etUserName.text.toString())
                 editor.putString("number",binding.etNumber.text.toString())

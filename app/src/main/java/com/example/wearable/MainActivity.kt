@@ -11,9 +11,16 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.example.wearable.databinding.ActivityMainBinding
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
+import com.google.android.gms.tasks.Task
+import java.io.*
 import java.lang.Exception
 import java.util.concurrent.TimeUnit
+import java.io.PrintStream
+
+
+
 
     //    class MainActivity : AppCompatActivity(),LocationListener {
 
@@ -28,9 +35,21 @@ import java.util.concurrent.TimeUnit
 
         private lateinit var locationRequest: LocationRequest
 
-        private lateinit var locationCallback: LocationCallback
 
-        private var currentLocation : Location? = null
+
+        private var locationCallback = object : LocationCallback(){
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult)
+
+                    for(currentLocations : Location in locationResult.locations){
+                        binding.tvLatitude.text = "Latitude : ${currentLocations.latitude.toString()}"
+                        binding.tvLongitude.text = "Longitude : ${currentLocations.longitude.toString()}"
+                        fileOutput("Latitude : ${currentLocations.latitude} , Longitude: ${currentLocations.longitude}")
+                        Log.d("updated locations","Altitude is ${currentLocations.altitude}")
+                    }
+            }
+        }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,18 +61,15 @@ import java.util.concurrent.TimeUnit
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         locationRequest = LocationRequest.create().apply {
-            interval = TimeUnit.SECONDS.toMillis(60)
-            fastestInterval = TimeUnit.SECONDS.toMillis(30)
-            maxWaitTime = TimeUnit.MINUTES.toMillis(1)
+            interval = TimeUnit.MINUTES.toMillis(5)
+            fastestInterval = TimeUnit.MINUTES.toMillis(4)
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
-        locationCallback = object : LocationCallback(){
-            override fun onLocationResult(locationResult: LocationResult) {
-                super.onLocationResult(locationResult)
-                currentLocation = locationResult.lastLocation
-            }
-        }
+        requestPermissions()
+        subscribeLocation()
+
+
 
         sharedPreferencesData = getSharedPreferences("MyPref", MODE_PRIVATE)
         val editor = sharedPreferencesData.edit()
@@ -67,37 +83,42 @@ import java.util.concurrent.TimeUnit
             startActivity(intent)
             finish()
         }
-
-
-        binding.btAccess.setOnClickListener {
-            requestPermissions()
-        }
-
-        binding.btLocation.setOnClickListener {
-//                subscribeLocation()
-                lastLocation()
-        }
-
     }
 
-        fun lastLocation(){
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissions()
+
+        private fun fileOutput(locations: String){
+            val file = File(this@MainActivity.filesDir, "text1")
+            if(!file.exists()){
+                file.mkdir()
             }
-            fusedLocationProviderClient.lastLocation.addOnSuccessListener {
-                binding.tvLongitude.text = it.longitude.toString()
-                binding.tvLatitude.text = it.latitude.toString()
+            try{
+                val locationFile = File(file, "Locations")
+                val writer = FileWriter(locationFile)
+                writer.append(locations)
+                writer.flush()
+                writer.close()
+//                val fileInput  = FileOutputStream(file)
+//                val printStream = PrintStream(fileInput)
+//                printStream.print(locations+"\n")
+//                fileInput.close()
+
+
+                Toast.makeText(this,"File Saved Successfully",Toast.LENGTH_SHORT).show()
+            } catch( e: Exception){
+                Toast.makeText(this,e.message,Toast.LENGTH_SHORT).show()
             }
         }
 
-        fun subscribeLocation(){
+        override fun onStop() {
+            super.onStop()
+            stopLocationUpdate()
+        }
+
+        private fun stopLocationUpdate(){
+            fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+        }
+
+        private fun subscribeLocation(){
             Log.d("Main Activity","Subscribed to location updates")
             try{
                 if (ActivityCompat.checkSelfPermission(
@@ -160,12 +181,10 @@ import java.util.concurrent.TimeUnit
             if(requestCode == 0 && grantResults.isNotEmpty()){
                 for(i in grantResults.indices){
                     if(grantResults[i] == PackageManager.PERMISSION_GRANTED){
-                        Log.d("Permissions","${permissions[i]} is granted")
+                        subscribeLocation()
                     }
                 }
             }
         }
-
-
 
     }
